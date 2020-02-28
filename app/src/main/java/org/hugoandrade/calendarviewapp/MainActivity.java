@@ -6,6 +6,9 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import java.util.Locale;
+
 /*import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -14,30 +17,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;*/
 
-import java.util.Locale;
-
 public class MainActivity extends AppCompatActivity {
-  //  private DatabaseReference EventRef;
+    //  private DatabaseReference EventRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setUKLocale(this);
-      // UserRef=FirebaseDatabase.getInstance().getReference().child("Events");
+        // UserRef=FirebaseDatabase.getInstance().getReference().child("Events");
         initializeUI();
     }
 
     private void initializeUI() {
 
-
-                Context context = MainActivity.this;
-               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            startActivity(CalendarViewWithNotesActivitySDK21.makeIntent(context));
-                        }
-                        else {
-                            startActivity(CalendarViewWithNotesActivity.makeIntent(context));
-                        }
+        Context context = MainActivity.this;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(CalendarViewWithNotesActivitySDK21.makeIntent(context));
+        } else {
+            startActivity(CalendarViewWithNotesActivity.makeIntent(context));
+        }
+        finish();
 
     }
 

@@ -143,7 +143,7 @@ public class CalendarViewWithNotesActivity extends AppCompatActivity {
                 color,
                 Color.TRANSPARENT
         ));
-        
+
     }
 
     private void showUnitSelector() {

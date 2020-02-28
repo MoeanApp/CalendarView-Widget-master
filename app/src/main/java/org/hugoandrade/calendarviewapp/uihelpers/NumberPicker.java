@@ -587,10 +587,10 @@ public class NumberPicker extends LinearLayout {
         mSelectionDividerColor = attributesArray.getColor(R.styleable.NumberPicker_np_dividerColor, mSelectionDividerColor);
 
         final int defSelectionDividerDistance = (int) TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDERS_DISTANCE,
-            getResources().getDisplayMetrics());
+                TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDERS_DISTANCE,
+                getResources().getDisplayMetrics());
         mSelectionDividersDistance = attributesArray.getDimensionPixelSize(
-            R.styleable.NumberPicker_np_dividerDistance, defSelectionDividerDistance);
+                R.styleable.NumberPicker_np_dividerDistance, defSelectionDividerDistance);
 
         final int defSelectionDividerThickness = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, UNSCALED_DEFAULT_SELECTION_DIVIDER_THICKNESS,

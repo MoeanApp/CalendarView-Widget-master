@@ -20,7 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
-import java.util.*;
+
 import org.hugoandrade.calendarviewapp.data.Event;
 import org.hugoandrade.calendarviewapp.utils.ColorUtils;
 
@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -138,14 +138,15 @@ public class CreateEventActivity extends AppCompatActivity  implements View.OnCl
             isViewMode = false;
         }
         else {
-            mCalendar = mOriginalEvent.getDate();
+            mCalendar = Calendar.getInstance();
+            mCalendar.setTime(mOriginalEvent.getDate());
             mColor = mOriginalEvent.getColor();
             mTitle = mOriginalEvent.getTitle();
             mIsComplete = mOriginalEvent.isCompleted();
             isViewMode = true;
         }
         ////..........................
-     //   EventRef.setValue();
+        //   EventRef.setValue();
     }
 
     private void initializeUI() {
@@ -268,6 +269,9 @@ public class CreateEventActivity extends AppCompatActivity  implements View.OnCl
     private void delete() {
         Log.e(getClass().getSimpleName(), "delete");
 
+        FirebaseDatabase.getInstance().getReference("Events").child(FirebaseAuth.getInstance().getUid())
+                .child(mOriginalEvent.id).removeValue();
+
         setResult(RESULT_OK, new Intent()
                 .putExtra(INTENT_EXTRA_ACTION, ACTION_DELETE)
                 .putExtra(INTENT_EXTRA_EVENT, mOriginalEvent));
@@ -279,7 +283,7 @@ public class CreateEventActivity extends AppCompatActivity  implements View.OnCl
     private void save() {
 
         int action = mOriginalEvent != null ? ACTION_EDIT : ACTION_CREATE;
-        String id = mOriginalEvent != null ? mOriginalEvent.getID() : generateID();
+        String id = mOriginalEvent != null ? mOriginalEvent.getId() : generateID();
         String rawTitle = mTitleView.getText().toString().trim();
       /*  int a1=  mCalendar.get(Calendar.MINUTE);
         int a2= mCalendar.get(Calendar.MILLISECOND);
@@ -290,12 +294,12 @@ public class CreateEventActivity extends AppCompatActivity  implements View.OnCl
         mOriginalEvent = new Event(
                 id,
                 rawTitle.isEmpty() ? null : rawTitle,
-                mCalendar,
+                mCalendar.getTime(),
                 mColor,
                 mIsCompleteCheckBox.isChecked()
         );
 
-     //   DatabaseReference  mDatabaseReference = mDatabase.getReference().child("Event");
+        //   DatabaseReference  mDatabaseReference = mDatabase.getReference().child("Event");
 
 
         setResult(RESULT_OK, new Intent()
@@ -306,10 +310,10 @@ public class CreateEventActivity extends AppCompatActivity  implements View.OnCl
         if (action == ACTION_CREATE)
             overridePendingTransition(R.anim.stay, R.anim.slide_out_down);
         //inal FirebaseDatabase database = FirebaseDatabase.getInstance();
-       // DatabaseReference ref = database.getReference("Events");
-     FirebaseDatabase.getInstance().getReference("Events").child(id).setValue(mOriginalEvent);
-      //  SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        //String mDate = sdf.format(new Date(mCalendar.getDate()));
+        // DatabaseReference ref = database.getReference("Events");
+        FirebaseDatabase.getInstance().getReference("Events").child(FirebaseAuth.getInstance().getUid()).child(id).setValue(mOriginalEvent);
+        //  SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        //String mDate = sdf.format(new date(mCalendar.getDate()));
 
 
 

@@ -280,7 +280,9 @@ public class CalendarDialog {
         private List<Event> getCalendarEventsOfDay(Calendar day) {
             List<Event> eventList = new ArrayList<>();
             for (Event e : mEventList) {
-                if (diffYMD(e.getDate(), day) == 0)
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(e.getDate());
+                if (diffYMD(calendar, day) == 0)
                     eventList.add(e);
             }
             return eventList;

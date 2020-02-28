@@ -1,11 +1,13 @@
 package org.hugoandrade.calendarviewapp;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.hugoandrade.calendarviewapp.data.Event;
 import org.hugoandrade.calendarviewapp.uihelpers.CalendarDialog;
@@ -22,7 +31,6 @@ import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CalendarViewWithNotesActivitySDK21 extends AppCompatActivity {
@@ -34,6 +42,7 @@ public class CalendarViewWithNotesActivitySDK21 extends AppCompatActivity {
     private CalendarDialog mCalendarDialog;
 
     private List<Event> mEventList = new ArrayList<>();
+    private ProgressDialog progressDialog;
 
     public static Intent makeIntent(Context context) {
         return new Intent(context, CalendarViewWithNotesActivitySDK21.class);
@@ -74,17 +83,39 @@ public class CalendarViewWithNotesActivitySDK21 extends AppCompatActivity {
                 if (calendarObjects.size() != 0) {
                     mCalendarDialog.setSelectedDate(selectedDate);
                     mCalendarDialog.show();
-                }
-                else {
+                } else {
                     if (diffYMD(previousDate, selectedDate) == 0)
                         createEvent(selectedDate);
                 }
             }
         });
 
-        for (Event e : mEventList) {
-            mCalendarView.addCalendarObject(parseCalendarObject(e));
-        }
+        showProgress();
+        FirebaseDatabase.getInstance().getReference("Events").child(FirebaseAuth.getInstance().getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(!isFinishing()) {
+                            hideProgress();
+                            mEventList.clear();
+                            for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                Event event = child.getValue(Event.class);
+                                mEventList.add(event);
+                            }
+
+                            updateCalendar(mEventList);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        if(!isFinishing()){
+                            hideProgress();
+                            Toast.makeText(CalendarViewWithNotesActivitySDK21.this, "error Happen", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
 
         if (getSupportActionBar() != null) {
             int month = mCalendarView.getCurrentDate().get(Calendar.MONTH);
@@ -100,21 +131,18 @@ public class CalendarViewWithNotesActivitySDK21 extends AppCompatActivity {
                 createEvent(mCalendarView.getSelectedDate());
             }
         });
+    }
 
-        mCalendarDialog = CalendarDialog.Builder.instance(this)
-                .setEventList(mEventList)
-                .setOnItemClickListener(new CalendarDialog.OnCalendarDialogListener() {
-                    @Override
-                    public void onEventClick(Event event) {
-                        onEventSelected(event);
-                    }
+    private void hideProgress() {
+        if(progressDialog != null && progressDialog.isShowing()){
+            progressDialog.dismiss();
+        }
+    }
 
-                    @Override
-                    public void onCreateEvent(Calendar calendar) {
-                        createEvent(calendar);
-                    }
-                })
-                .create();
+    private void showProgress() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
     }
 
     private void onEventSelected(Event event) {
@@ -122,7 +150,7 @@ public class CalendarViewWithNotesActivitySDK21 extends AppCompatActivity {
         Intent intent = CreateEventActivity.makeIntent(context, event);
 
         startActivityForResult(intent, CREATE_EVENT_REQUEST_CODE);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.stay );
+        overridePendingTransition(R.anim.slide_in_up, R.anim.stay);
     }
 
     private void createEvent(Calendar selectedDate) {
@@ -130,7 +158,7 @@ public class CalendarViewWithNotesActivitySDK21 extends AppCompatActivity {
         Intent intent = CreateEventActivity.makeIntent(context, selectedDate);
 
         startActivityForResult(intent, CREATE_EVENT_REQUEST_CODE);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.stay );
+        overridePendingTransition(R.anim.slide_in_up, R.anim.stay);
     }
 
     @Override
@@ -161,43 +189,43 @@ public class CalendarViewWithNotesActivitySDK21 extends AppCompatActivity {
 
                 switch (action) {
                     case CreateEventActivity.ACTION_CREATE: {
-                        mEventList.add(event);
-                        mCalendarView.addCalendarObject(parseCalendarObject(event));
-                        mCalendarDialog.setEventList(mEventList);
+//                        mEventList.add(event);
+//                        mCalendarView.addCalendarObject(parseCalendarObject(event));
+//                        mCalendarDialog.setEventList(mEventList);
                         break;
                     }
                     case CreateEventActivity.ACTION_EDIT: {
-                        Event oldEvent = null;
-                        for (Event e : mEventList) {
-                            if (Objects.equals(event.getID(), e.getID())) {
-                                oldEvent = e;
-                                break;
-                            }
-                        }
-                        if (oldEvent != null) {
-                            mEventList.remove(oldEvent);
-                            mEventList.add(event);
-
-                            mCalendarView.removeCalendarObjectByID(parseCalendarObject(oldEvent));
-                            mCalendarView.addCalendarObject(parseCalendarObject(event));
-                            mCalendarDialog.setEventList(mEventList);
-                        }
+//                        Event oldEvent = null;
+//                        for (Event e : mEventList) {
+//                            if (Objects.equals(event.getId(), e.getId())) {
+//                                oldEvent = e;
+//                                break;
+//                            }
+//                        }
+//                        if (oldEvent != null) {
+//                            mEventList.remove(oldEvent);
+//                            mEventList.add(event);
+//
+//                            mCalendarView.removeCalendarObjectByID(parseCalendarObject(oldEvent));
+//                            mCalendarView.addCalendarObject(parseCalendarObject(event));
+//                            mCalendarDialog.setEventList(mEventList);
+//                        }
                         break;
                     }
                     case CreateEventActivity.ACTION_DELETE: {
-                        Event oldEvent = null;
-                        for (Event e : mEventList) {
-                            if (Objects.equals(event.getID(), e.getID())) {
-                                oldEvent = e;
-                                break;
-                            }
-                        }
-                        if (oldEvent != null) {
-                            mEventList.remove(oldEvent);
-                            mCalendarView.removeCalendarObjectByID(parseCalendarObject(oldEvent));
-
-                            mCalendarDialog.setEventList(mEventList);
-                        }
+//                        Event oldEvent = null;
+//                        for (Event e : mEventList) {
+//                            if (Objects.equals(event.getId(), e.getId())) {
+//                                oldEvent = e;
+//                                break;
+//                            }
+//                        }
+//                        if (oldEvent != null) {
+//                            mEventList.remove(oldEvent);
+//                            mCalendarView.removeCalendarObjectByID(parseCalendarObject(oldEvent));
+//
+//                            mCalendarDialog.setEventList(mEventList);
+//                        }
                         break;
                     }
                 }
@@ -217,11 +245,40 @@ public class CalendarViewWithNotesActivitySDK21 extends AppCompatActivity {
     }
 
     private static CalendarView.CalendarObject parseCalendarObject(Event event) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(event.getDate());
         return new CalendarView.CalendarObject(
-                event.getID(),
-                event.getDate(),
+                event.getId(),
+                calendar,
                 event.getColor(),
                 event.isCompleted() ? Color.TRANSPARENT : Color.RED);
+    }
+
+    public void updateCalendar(@NonNull List<Event> events) {
+        List<CalendarView.CalendarObject> list = new ArrayList<>();
+        for (Event event : events) {
+            list.add(parseCalendarObject(event));
+        }
+
+        mCalendarView.setCalendarObjectList(list);
+
+
+        mCalendarDialog = CalendarDialog.Builder.instance(this)
+                .setEventList(events)
+                .setOnItemClickListener(new CalendarDialog.OnCalendarDialogListener() {
+                    @Override
+                    public void onEventClick(Event event) {
+                        onEventSelected(event);
+                    }
+
+                    @Override
+                    public void onCreateEvent(Calendar calendar) {
+                        createEvent(calendar);
+                    }
+                })
+                .create();
+
+
     }
 
 }
