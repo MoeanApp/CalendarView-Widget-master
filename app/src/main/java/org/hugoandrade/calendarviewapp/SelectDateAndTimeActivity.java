@@ -105,6 +105,7 @@ public class SelectDateAndTimeActivity extends AppCompatActivity {
         mCalendar.set(Calendar.MILLISECOND, 0);
 
         setResult(RESULT_OK, new Intent().putExtra(INTENT_EXTRA_CALENDAR, mCalendar));
+
         onBackPressed();
     }
 }

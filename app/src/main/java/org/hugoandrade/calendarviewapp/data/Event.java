@@ -5,9 +5,7 @@ import android.os.Parcelable;
 
 import java.util.Calendar;
 
-/**
- * Created by Hugo Andrade on 25/03/2018.
- */
+
 
 public class Event implements Parcelable {
 
@@ -60,6 +58,7 @@ public class Event implements Parcelable {
         dest.writeInt(mColor);
         dest.writeSerializable(mDate);
         dest.writeByte((byte) (isCompleted ? 1 : 0));
+
     }
 
     @Override

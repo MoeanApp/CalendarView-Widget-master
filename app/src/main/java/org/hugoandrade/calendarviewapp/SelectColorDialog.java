@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import org.hugoandrade.calendarviewapp.utils.ColorUtils;
 
 public class SelectColorDialog {
@@ -23,6 +22,8 @@ public class SelectColorDialog {
 
     private android.app.AlertDialog alert;
     private OptionsAdapter mOptionsAdapter;
+
+
 
     SelectColorDialog(Context context) {
         mContext = context;

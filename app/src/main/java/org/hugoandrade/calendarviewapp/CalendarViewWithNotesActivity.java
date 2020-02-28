@@ -136,12 +136,14 @@ public class CalendarViewWithNotesActivity extends AppCompatActivity {
     }
 
     private void addEventToCalendarView(int color) {
+
         mCalendarView.addCalendarObject(new CalendarView.CalendarObject(
                 null,
                 mCalendarView.getSelectedDate(),
                 color,
                 Color.TRANSPARENT
         ));
+        
     }
 
     private void showUnitSelector() {

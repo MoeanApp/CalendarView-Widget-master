@@ -20,7 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
-
+import java.util.*;
 import org.hugoandrade.calendarviewapp.data.Event;
 import org.hugoandrade.calendarviewapp.utils.ColorUtils;
 
@@ -28,8 +28,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class CreateEventActivity extends AppCompatActivity {
+public class CreateEventActivity extends AppCompatActivity  implements View.OnClickListener{
+
 
     public static final int ACTION_DELETE = 1;
     public static final int ACTION_EDIT = 2;
@@ -58,7 +62,9 @@ public class CreateEventActivity extends AppCompatActivity {
     private TextView mDateTextView;
     private CardView mColorCardView;
     private View mHeader;
-
+    //  EditText t= findViewById(R.id.et_event_title);
+    //  Checkbox ch= findViewById(R.id.checkbox_completed);
+    private FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
     public static Intent makeIntent(Context context, @NonNull Calendar calendar) {
         return new Intent(context, CreateEventActivity.class).putExtra(INTENT_EXTRA_CALENDAR, calendar);
@@ -84,10 +90,10 @@ public class CreateEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         setResult(RESULT_CANCELED);
 
         extractDataFromIntentAndInitialize();
-
         initializeUI();
     }
 
@@ -138,6 +144,8 @@ public class CreateEventActivity extends AppCompatActivity {
             mIsComplete = mOriginalEvent.isCompleted();
             isViewMode = true;
         }
+        ////..........................
+     //   EventRef.setValue();
     }
 
     private void initializeUI() {
@@ -273,6 +281,11 @@ public class CreateEventActivity extends AppCompatActivity {
         int action = mOriginalEvent != null ? ACTION_EDIT : ACTION_CREATE;
         String id = mOriginalEvent != null ? mOriginalEvent.getID() : generateID();
         String rawTitle = mTitleView.getText().toString().trim();
+      /*  int a1=  mCalendar.get(Calendar.MINUTE);
+        int a2= mCalendar.get(Calendar.MILLISECOND);
+        int a3= mCalendar.get(Calendar.HOUR_OF_DAY);
+        int a4= mCalendar.get(Calendar.SECOND);*/
+
 
         mOriginalEvent = new Event(
                 id,
@@ -282,6 +295,8 @@ public class CreateEventActivity extends AppCompatActivity {
                 mIsCompleteCheckBox.isChecked()
         );
 
+     //   DatabaseReference  mDatabaseReference = mDatabase.getReference().child("Event");
+
 
         setResult(RESULT_OK, new Intent()
                 .putExtra(INTENT_EXTRA_ACTION, action)
@@ -290,6 +305,14 @@ public class CreateEventActivity extends AppCompatActivity {
 
         if (action == ACTION_CREATE)
             overridePendingTransition(R.anim.stay, R.anim.slide_out_down);
+        //inal FirebaseDatabase database = FirebaseDatabase.getInstance();
+       // DatabaseReference ref = database.getReference("Events");
+     FirebaseDatabase.getInstance().getReference("Events").child(id).setValue(mOriginalEvent);
+      //  SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        //String mDate = sdf.format(new Date(mCalendar.getDate()));
+
+
+
 
     }
 
@@ -310,5 +333,10 @@ public class CreateEventActivity extends AppCompatActivity {
 
     private static String generateID() {
         return Long.toString(System.currentTimeMillis());
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 }

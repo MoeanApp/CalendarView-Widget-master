@@ -6,24 +6,25 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+/*import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.TextView;*/
 
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+  //  private DatabaseReference EventRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setUKLocale(this);
-
+      // UserRef=FirebaseDatabase.getInstance().getReference().child("Events");
         initializeUI();
     }
 
